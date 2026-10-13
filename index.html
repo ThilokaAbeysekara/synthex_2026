@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SYNTHEX 2026 | Research Pitch Competition</title>
+  <meta name="description" content="SYNTHEX 2026 Pitch Competition - Submit your innovative research ideas and transform vision into reality.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  
+  <!-- Fonts: Space Grotesk & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Ambient Glowing Background Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand-logo">
+        <span class="logo-text">SYNTHEX &nbsp; 2026</span>
+      </a>
+
+      <div class="nav-actions">
+        <span class="status-pill">
+          <span class="pulse-dot"></span>
+          Submissions Open
+        </span>
+        <a href="#submit-section" class="nav-cta-btn">Submit Idea</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+      
+      <div class="hero-content">
+        <!-- Badge -->
+        <div class="hero-badge">
+          <span class="sparkle">✦</span>
+          <span>Future Research & Innovation Showcase</span>
+          <span class="sparkle">✦</span>
+        </div>
+
+        <!-- Main Title SYNTHEX -->
+        <h1 class="hero-title" data-text="SYNTHEX">SYNTHEX</h1>
+
+        <!-- Pitch Competition Subtitle -->
+        <p class="hero-subtitle">Pitch Competition</p>
+
+        <!-- Description Tagline -->
+        <p class="hero-description">
+          Where groundbreaking research meets transformative vision. Showcase your technical 
+          novelty, solve real-world grand challenges, and pitch your ideas now.
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="hero-actions">
+          <button id="hero-submit-btn" class="cta-primary-btn">
+            <span class="btn-glow"></span>
+            <span class="btn-text">Submit Your Idea</span>
+            <svg class="btn-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </button>
+          
+          <a href="#highlights-section" class="cta-secondary-btn">
+            Explore Tracks
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </a>
+        </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlights Section -->
+    <section id="highlights-section" class="highlights-section">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag">COMPETITION PILLARS</span>
+          <h2 class="section-title">Why Pitch at SYNTHEX?</h2>
+          <p class="section-desc">Turn your technical curiosity into impactful scholarly and industrial innovations.</p>
+        </div>
+
+        <div class="cards-grid">
+          <div class="feature-card">
+            <div class="card-icon-box">💡</div>
+            <h3>Novel Research Ideas</h3>
+            <p>From Artificial Intelligence and Edge Computing to Renewable Systems, all cutting-edge engineering domains are welcome.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon-box">🎯</div>
+            <h3>Expert Feedback</h3>
+            <p>Get evaluated by an esteemed panel of researchers and industry judges to refine your methodology and roadmap.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon-box">🚀</div>
+            <h3>Recognition & Support</h3>
+            <p>Top submissions receive mentorship, publication pathways, and incubation opportunities for prototype development.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Submission Form Section -->
+    <section id="submit-section" class="form-section">
+      <div class="section-container">
+        
+        <!-- Form Header -->
+        <div class="form-header-box">
+          <div class="form-pill">
+            <span class="dot-indicator"></span>
+            IDEA SUBMISSION PORTAL
+          </div>
+          <h2 class="form-main-title">Submit Your Research Idea</h2>
+          <p class="form-sub-desc">
+            Complete the form below to enter the SYNTHEX 2026 Pitch Competition.
+          </p>
+        </div>
+
+        <!-- Glassmorphism Form Card -->
+        <div class="form-card-wrapper">
+          <div class="form-glow-backdrop"></div>
+          
+          <form id="idea-form" class="modern-form" novalidate>
+            
+            <!-- Field 1: Registration Number -->
+            <div class="form-group" id="group-regNo">
+              <label for="regNo" class="form-label">
+                Registration No <span class="required-star">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="regNo" 
+                  name="regNo" 
+                  class="form-control" 
+                  placeholder="e.g., 2021/ICT/045"
+                  required
+                  autocomplete="off"
+                >
+                <span class="validation-badge"></span>
+              </div>
+            </div>
+
+            <!-- Field 2: Full Name -->
+            <div class="form-group" id="group-fullName">
+              <label for="fullName" class="form-label">
+                Name <span class="required-star">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="fullName" 
+                  name="fullName" 
+                  class="form-control" 
+                  placeholder="Enter your full name" 
+                  required
+                  autocomplete="name"
+                >
+                <span class="validation-badge"></span>
+              </div>
+            </div>
+
+            <!-- Field 3: Select Your Batch -->
+            <div class="form-group" id="group-batch">
+              <label class="form-label">
+                Select Your Batch <span class="required-star">*</span>
+              </label>
+              
+              <!-- Interactive Batch Selection Pills -->
+              <div class="batch-pills-container" role="radiogroup" aria-label="Select Your Batch">
+                <button type="button" class="batch-pill" data-batch="23/24">
+                  <span class="batch-radio"></span>
+                  <span class="batch-text">23/24</span>
+                </button>
+                <button type="button" class="batch-pill" data-batch="22/23">
+                  <span class="batch-radio"></span>
+                  <span class="batch-text">22/23</span>
+                </button>
+                <button type="button" class="batch-pill" data-batch="21/22">
+                  <span class="batch-radio"></span>
+                  <span class="batch-text">21/22</span>
+                </button>
+                <button type="button" class="batch-pill" data-batch="20/21">
+                  <span class="batch-radio"></span>
+                  <span class="batch-text">20/21</span>
+                </button>
+              </div>
+
+              <!-- Hidden Native Select (synced for form data) -->
+              <select id="batch" name="batch" class="hidden-select" required>
+                <option value="" disabled selected>Select your batch</option>
+                <option value="23/24">23/24</option>
+                <option value="22/23">22/23</option>
+                <option value="21/22">21/22</option>
+                <option value="20/21">20/21</option>
+              </select>
+            </div>
+
+            <!-- Field 4: Topic of Your Idea -->
+            <div class="form-group" id="group-topic">
+              <label for="topic" class="form-label">
+                Topic of Your Idea <span class="required-star">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                    <path d="M9 18h6"/><path d="M10 22h4"/>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="topic" 
+                  name="topic" 
+                  class="form-control" 
+                  placeholder="e.g., Autonomous Edge-AI for Disaster Rescue Swarms" 
+                  required
+                  autocomplete="off"
+                >
+                <span class="validation-badge"></span>
+              </div>
+            </div>
+
+            <!-- Field 5: Describe Your Idea -->
+            <div class="form-group" id="group-description">
+              <div class="label-with-counter">
+                <label for="description" class="form-label">
+                  Describe Your Idea
+                </label>
+                <span id="char-counter" class="char-count">0 characters</span>
+              </div>
+
+              <div class="textarea-wrapper">
+                <textarea 
+                  id="description" 
+                  name="description" 
+                  class="form-control form-textarea" 
+                  rows="5" 
+                  placeholder="Provide an overview of your research idea: What problem does it solve? What is your methodology or proposed technology? What impact do you anticipate?"
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Submission Status Alert -->
+            <div id="form-alert" class="form-alert" style="display: none;"></div>
+
+            <!-- Submit Button & Action Bar -->
+            <div class="form-action-bar">
+              <button type="submit" id="submit-btn" class="submit-action-btn">
+                <span class="btn-spinner" id="btn-spinner" style="display: none;"></span>
+                <span class="btn-label" id="btn-label">Submit Research Idea</span>
+                <svg class="submit-arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Success Celebration Modal -->
+  <div id="success-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card">
+      <div class="success-icon-animated">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+
+      <span class="success-badge">SUBMISSION CONFIRMED</span>
+      <h3 class="modal-title">Idea Successfully Submitted!</h3>
+      <p class="modal-desc">
+        Your research proposal has been recorded and safely synchronized with the official SYNTHEX 2026 Google Spreadsheet.
+      </p>
+
+      <!-- Submission Summary Box -->
+      <div class="receipt-box">
+        <div class="receipt-row">
+          <span class="receipt-key">Topic:</span>
+          <span class="receipt-val" id="receipt-topic">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-key">Presenter:</span>
+          <span class="receipt-val" id="receipt-name">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-key">Batch:</span>
+          <span class="receipt-val" id="receipt-batch">-</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-key">Reference ID:</span>
+          <span class="receipt-val" id="receipt-id">-</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="close-modal-btn" class="modal-primary-btn">Submit Another Idea</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Spreadsheet Integration Config Modal -->
+  <div id="config-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card config-card">
+      <div class="config-modal-header">
+        <div class="config-title-group">
+          <div class="config-icon">📊</div>
+          <div>
+            <h3>Google Spreadsheet Sync Settings</h3>
+            <p>Configure where submitted ideas are stored</p>
+          </div>
+        </div>
+        <button id="close-config-btn" class="close-x-btn" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="config-content">
+        <!-- Active Status -->
+        <div class="integration-status-card">
+          <div class="status-indicator-live">
+            <span class="live-dot"></span>
+            <div>
+              <strong>Live Mode: Connected to SYNTHEX Google Form & Sheet</strong>
+              <p>Form ID: <code>17yshc-_WReK7hkJFw-Rja6fRgYTfuDDETcJBow-sPzI</code></p>
+            </div>
+          </div>
+          <span class="connected-badge">ACTIVE</span>
+        </div>
+
+        <div class="config-tabs">
+          <p class="config-info-text">
+            Every submission sent through this site is instantly submitted into your Google Form's response database and its linked Google Spreadsheet!
+          </p>
+
+          <div class="guide-box">
+            <h4>How to view your responses in Google Sheets:</h4>
+            <ol>
+              <li>Open your Google Form at <a href="https://docs.google.com/forms/d/17yshc-_WReK7hkJFw-Rja6fRgYTfuDDETcJBow-sPzI/edit" target="_blank" rel="noopener">Google Forms Edit</a></li>
+              <li>Click on the <strong>Responses</strong> tab at the top</li>
+              <li>Click the green <strong>"Link to Sheets"</strong> icon</li>
+              <li>All entries submitted from this website will appear in real time in your Google Spreadsheet!</li>
+            </ol>
+          </div>
+
+          <!-- Custom Webhook URL Option (for Standalone Google Sheet via Apps Script) -->
+          <div class="advanced-section">
+            <label for="custom-script-url" class="advanced-label">
+              <span>Optional: Custom Google Apps Script Web App URL</span>
+              <span class="tag-opt">Advanced</span>
+            </label>
+            <input 
+              type="url" 
+              id="custom-script-url" 
+              class="form-control code-input" 
+              placeholder="https://script.google.com/macros/s/.../exec"
+            >
+            <p class="input-hint">Leave blank to use the pre-configured default Google Form/Sheet sync, or paste your Apps Script URL here.</p>
+          </div>
+
+          <!-- Local Backup Data Storage -->
+          <div class="local-backup-bar">
+            <span>Local Stored Submissions: <strong id="backup-count">0</strong></span>
+            <button id="export-csv-btn" class="export-btn" type="button">Download CSV Backup</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions config-actions">
+        <button id="save-config-btn" class="modal-primary-btn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <div class="brand-logo footer-logo">
+          <span class="logo-symbol">⚡</span>
+          <span class="logo-text">SYNTHEX 2026</span>
+        </div>
+        <p class="footer-tagline">Annual Research Pitch Competition • Fueling the Next Generation of Thinkers</p>
+      </div>
+
+      <div class="footer-right">
+        <p class="copyright">© 2026 SYNTHEX. All research rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Confetti Canvas for Celebration -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>
