@@ -847,7 +847,7 @@ async function handleFormSubmit(e) {
   // Button Loading State
   submitBtn.disabled = true;
   btnSpinner.style.display = "inline-block";
-  btnLabel.textContent = "Synchronizing with Spreadsheet...";
+  btnLabel.textContent = "Processing...";
 
   try {
     // 1. Submit to Google Sheets (Direct Form endpoint or Apps Script Webhook)
