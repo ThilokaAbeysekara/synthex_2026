@@ -1172,6 +1172,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  padding-top: 1.15rem;
 }
 
 .required-star {
