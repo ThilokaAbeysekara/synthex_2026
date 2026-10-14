@@ -8,16 +8,26 @@
 
 // Configuration & Default Endpoints
 const CONFIG = {
-  // Pre-configured Google Form response endpoint & entry mapping
+  // =========================================================================
+  // SUBMISSION STATUS TOGGLE (Option A)
+  // Set to true to OPEN submissions across the platform.
+  // Set to false to CLOSE submissions, lock the form, and show closed notices.
+  // =========================================================================
+  submissionsOpen: true,
+
+  // Pre-configured Google Form response endpoint & unified entry mapping
   googleForm: {
     endpoint: "https://docs.google.com/forms/d/e/1FAIpQLScD6u8ZjARToVR_nfJev-ZMqbMspLc26ztLPTk9jkQNrdYk8w/formResponse",
     entries: {
-      regNo: "entry.1209126931",
-      fullName: "entry.618052818",
+      submissionType: "entry.1807794449",
       batch: "entry.2122323594",
-      topic: "entry.2052985421",
-      description: "entry.567243227"
-    }
+      regAndNames: "entry.1568231834",
+      topic: "entry.2007979790",
+      description: "entry.931518053",
+      email: "entry.1592693011",
+      phone: "entry.372663994"
+    },
+    pageHistory: "0"
   },
   // Custom Google Apps Script Web App URL (if provided by user)
   customScriptUrlKey: "synthex_custom_script_url",
@@ -25,20 +35,127 @@ const CONFIG = {
 };
 
 // State
+let selectedSubmissionType = "individual"; // "individual" | "group"
 let selectedBatch = "";
 
-// DOM Elements
+// DOM Elements Initialization
 document.addEventListener("DOMContentLoaded", () => {
+  applySubmissionStatus();
   initAmbientCanvas();
+  initSubmissionTypeToggle();
+  initGroupMembersTable();
   initBatchPills();
   initFormInteractions();
+  initDockInteractions();
+  initBulbInteractions();
   initModals();
   initSettings();
   updateBackupCounter();
 });
 
+/**
+ * Checks whether submissions are currently open.
+ * Evaluates CONFIG.submissionsOpen.
+ * Supports URL override for previewing: ?closed=1 or ?submissions=closed (forces closed)
+ * and ?open=1 or ?submissions=open (forces open).
+ */
+function isSubmissionsOpen() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("closed") === "1" || params.get("submissions") === "closed") {
+      return false;
+    }
+    if (params.get("open") === "1" || params.get("submissions") === "open") {
+      return true;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return CONFIG.submissionsOpen !== false;
+}
+
+/**
+ * Applies submission open/closed state across all UI elements on both index and submit pages.
+ */
+function applySubmissionStatus() {
+  const isOpen = isSubmissionsOpen();
+
+  // 1. Update all status pills (.status-pill)
+  const statusPills = document.querySelectorAll(".status-pill");
+  statusPills.forEach(pill => {
+    const dot = pill.querySelector(".pulse-dot");
+    const label = pill.querySelector("span:not(.pulse-dot)");
+
+    if (!isOpen) {
+      pill.classList.add("status-closed");
+      if (dot) dot.classList.add("dot-closed");
+      if (label) label.textContent = "Submissions Closed";
+      pill.setAttribute("title", "Idea submissions are currently closed");
+    } else {
+      pill.classList.remove("status-closed");
+      if (dot) dot.classList.remove("dot-closed");
+      if (label) label.textContent = "Submissions Open";
+      pill.setAttribute("title", "Idea submissions are currently open");
+    }
+  });
+
+  // 2. Update navigation CTA buttons (.nav-cta-btn, excluding the 'Home' return pill on submit.html)
+  const navCtaBtns = document.querySelectorAll(".nav-cta-btn:not(.nav-secondary-pill):not(.nav-back-btn)");
+  navCtaBtns.forEach(btn => {
+    if (!isOpen) {
+      btn.textContent = "Submissions Closed";
+      btn.classList.add("nav-cta-closed");
+      btn.setAttribute("aria-disabled", "true");
+      btn.setAttribute("title", "Submissions are currently closed");
+    } else {
+      btn.textContent = "Submit Idea";
+      btn.classList.remove("nav-cta-closed");
+      btn.removeAttribute("aria-disabled");
+      btn.removeAttribute("title");
+    }
+  });
+
+  // 3. Update Hero CTA button (#hero-submit-btn) on homepage
+  const heroBtn = document.getElementById("hero-submit-btn");
+  if (heroBtn) {
+    const btnText = heroBtn.querySelector(".btn-text");
+    if (!isOpen) {
+      if (btnText) btnText.textContent = "Submissions Closed";
+      heroBtn.classList.add("cta-btn-closed");
+      heroBtn.setAttribute("aria-disabled", "true");
+      heroBtn.setAttribute("title", "Submissions are currently closed");
+    } else {
+      if (btnText) btnText.textContent = "Submit Your Idea";
+      heroBtn.classList.remove("cta-btn-closed");
+      heroBtn.removeAttribute("aria-disabled");
+      heroBtn.removeAttribute("title");
+    }
+  }
+
+  // 4. Update Submit Page Form vs. Closed Card
+  const form = document.getElementById("idea-form");
+  const closedCard = document.getElementById("submissions-closed-card");
+  const formHeaderDesc = document.querySelector(".form-sub-desc");
+
+  if (closedCard && form) {
+    if (!isOpen) {
+      form.style.display = "none";
+      closedCard.style.display = "flex";
+      if (formHeaderDesc) {
+        formHeaderDesc.textContent = "The idea submission portal for SYNTHEX 2026 is currently closed.";
+      }
+    } else {
+      form.style.display = "block";
+      closedCard.style.display = "none";
+      if (formHeaderDesc) {
+        formHeaderDesc.textContent = "Complete the form below to enter the SYNTHEX 2026 Pitch Competition.";
+      }
+    }
+  }
+}
+
 /* ==========================================================================
-   1. AMBIENT CONSTELLATION & PARTICLES CANVAS (Dark Blue Aesthetic)
+   1. AMBIENT CONSTELLATION & PARTICLES CANVAS (Electric Green Particles)
    ========================================================================== */
 function initAmbientCanvas() {
   const canvas = document.getElementById("ambient-canvas");
@@ -46,8 +163,8 @@ function initAmbientCanvas() {
   const ctx = canvas.getContext("2d");
   let width, height;
   let particles = [];
-  const particleCount = 55;
-  const maxDistance = 140;
+  const particleCount = 45;
+  const maxDistance = 130;
 
   function resize() {
     width = canvas.width = window.innerWidth;
@@ -60,10 +177,10 @@ function initAmbientCanvas() {
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.45;
-      this.vy = (Math.random() - 0.5) * 0.45;
-      this.radius = Math.random() * 2 + 1;
-      this.alpha = Math.random() * 0.5 + 0.2;
+      this.vx = (Math.random() - 0.5) * 0.35;
+      this.vy = (Math.random() - 0.5) * 0.35;
+      this.radius = Math.random() * 1.8 + 0.8;
+      this.alpha = Math.random() * 0.4 + 0.15;
     }
 
     update() {
@@ -80,7 +197,7 @@ function initAmbientCanvas() {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(0, 255, 135, ${this.alpha})`;
-      ctx.shadowBlur = 8;
+      ctx.shadowBlur = 6;
       ctx.shadowColor = "#00FF87";
       ctx.fill();
     }
@@ -101,12 +218,12 @@ function initAmbientCanvas() {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < maxDistance) {
-          const alpha = (1 - dist / maxDistance) * 0.18;
+          const alpha = (1 - dist / maxDistance) * 0.14;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
           ctx.strokeStyle = `rgba(0, 255, 135, ${alpha})`;
-          ctx.lineWidth = 1;
+          ctx.lineWidth = 0.8;
           ctx.stroke();
         }
       }
@@ -124,7 +241,291 @@ function initAmbientCanvas() {
 }
 
 /* ==========================================================================
-   2. INTERACTIVE BATCH PILLS SELECTOR
+   2. SUBMISSION TYPE TOGGLE (Individual vs Group)
+   ========================================================================== */
+function initSubmissionTypeToggle() {
+  const individualBtn = document.getElementById("type-individual-btn");
+  const groupBtn = document.getElementById("type-group-btn");
+  const typeInput = document.getElementById("submissionType");
+  const panelIndividual = document.getElementById("participant-individual-panel");
+  const panelGroup = document.getElementById("participant-group-panel");
+  const badgeEl = document.getElementById("participant-badge");
+  const emailSubhint = document.getElementById("email-subhint");
+
+  if (!individualBtn || !groupBtn) return;
+
+  function switchType(type) {
+    selectedSubmissionType = type;
+    if (typeInput) typeInput.value = type;
+
+    if (type === "individual") {
+      individualBtn.classList.add("active");
+      groupBtn.classList.remove("active");
+      if (panelIndividual) panelIndividual.style.display = "block";
+      if (panelGroup) panelGroup.style.display = "none";
+      if (badgeEl) badgeEl.textContent = "Individual Participant Details";
+      if (emailSubhint) emailSubhint.textContent = "";
+
+      // Sync lead from group table to individual if individual inputs are empty
+      const tableBody = document.getElementById("members-table-body");
+      if (tableBody) {
+        const leadReg = tableBody.querySelector('.member-row[data-member-index="1"] .member-reg');
+        const leadName = tableBody.querySelector('.member-row[data-member-index="1"] .member-name');
+        const regInput = document.getElementById("regNo");
+        const nameInput = document.getElementById("fullName");
+        if (leadReg && regInput && !regInput.value.trim() && leadReg.value.trim()) {
+          regInput.value = leadReg.value.trim();
+        }
+        if (leadName && nameInput && !nameInput.value.trim() && leadName.value.trim()) {
+          nameInput.value = leadName.value.trim();
+        }
+      }
+    } else {
+      groupBtn.classList.add("active");
+      individualBtn.classList.remove("active");
+      if (panelIndividual) panelIndividual.style.display = "none";
+      if (panelGroup) panelGroup.style.display = "block";
+      if (badgeEl) badgeEl.textContent = "Group Members Details";
+      if (emailSubhint) emailSubhint.textContent = "(Primary Contact / Team Lead)";
+
+      // Sync individual to lead in group table if row 1 is empty
+      const regInput = document.getElementById("regNo");
+      const nameInput = document.getElementById("fullName");
+      const tableBody = document.getElementById("members-table-body");
+      if (tableBody && regInput && nameInput) {
+        const leadReg = tableBody.querySelector('.member-row[data-member-index="1"] .member-reg');
+        const leadName = tableBody.querySelector('.member-row[data-member-index="1"] .member-name');
+        if (leadReg && !leadReg.value.trim() && regInput.value.trim()) {
+          leadReg.value = regInput.value.trim();
+        }
+        if (leadName && !leadName.value.trim() && nameInput.value.trim()) {
+          leadName.value = nameInput.value.trim();
+        }
+      }
+    }
+
+    // Clear submission alert
+    showAlert("", "");
+  }
+
+  individualBtn.addEventListener("click", () => switchType("individual"));
+  groupBtn.addEventListener("click", () => switchType("group"));
+}
+
+/* ==========================================================================
+   3. DYNAMIC GROUP MEMBERS TABLE MANAGER (Min 2, Max 6)
+   ========================================================================== */
+const MAX_GROUP_MEMBERS = 6;
+const MIN_GROUP_MEMBERS = 2;
+
+function initGroupMembersTable() {
+  const tableBody = document.getElementById("members-table-body");
+  const addBtn = document.getElementById("add-member-btn");
+  if (!tableBody || !addBtn) return;
+
+  function updateMemberRows() {
+    const rows = tableBody.querySelectorAll(".member-row");
+    const count = rows.length;
+    const countEl = document.getElementById("members-count");
+    const maxAlert = document.getElementById("max-members-alert");
+
+    if (countEl) countEl.textContent = count;
+
+    rows.forEach((row, idx) => {
+      const memberNum = idx + 1;
+      row.setAttribute("data-member-index", memberNum);
+      const indexCell = row.querySelector(".col-index");
+      const actionCell = row.querySelector(".col-action");
+      const regInput = row.querySelector(".member-reg");
+      const nameInput = row.querySelector(".member-name");
+
+      if (indexCell) {
+        if (memberNum === 1) {
+          indexCell.innerHTML = `<span class="member-badge lead-badge">1 (Lead)</span>`;
+        } else {
+          indexCell.innerHTML = `<span class="member-badge">${memberNum}</span>`;
+        }
+      }
+
+      if (regInput) {
+        regInput.setAttribute("placeholder", `e.g. 22APP123${memberNum + 3}`);
+      }
+      if (nameInput) {
+        nameInput.setAttribute("placeholder", memberNum === 1 ? "e.g. A.B.C.D. Perera" : `e.g. Member ${memberNum} Name`);
+      }
+
+      if (actionCell) {
+        // Members 1 and 2 cannot be removed (min 2)
+        if (memberNum <= MIN_GROUP_MEMBERS) {
+          actionCell.innerHTML = "";
+        } else {
+          actionCell.innerHTML = `
+            <button type="button" class="remove-member-btn" title="Remove Member ${memberNum}" aria-label="Remove Member">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+              </svg>
+            </button>
+          `;
+          const removeBtn = actionCell.querySelector(".remove-member-btn");
+          if (removeBtn) {
+            removeBtn.addEventListener("click", () => {
+              row.remove();
+              updateMemberRows();
+            });
+          }
+        }
+      }
+    });
+
+    // Enforce maximum 6 members
+    if (count >= MAX_GROUP_MEMBERS) {
+      addBtn.style.display = "none";
+      if (maxAlert) maxAlert.style.display = "inline-flex";
+    } else {
+      addBtn.style.display = "inline-flex";
+      if (maxAlert) maxAlert.style.display = "none";
+    }
+  }
+
+  // Add Member button click
+  addBtn.addEventListener("click", () => {
+    const rows = tableBody.querySelectorAll(".member-row");
+    if (rows.length >= MAX_GROUP_MEMBERS) return;
+
+    const newRow = document.createElement("tr");
+    newRow.className = "member-row";
+    newRow.innerHTML = `
+      <td class="col-index"></td>
+      <td class="col-reg">
+        <input 
+          type="text" 
+          class="form-control member-input member-reg" 
+          placeholder="" 
+          required
+          autocomplete="off"
+        >
+      </td>
+      <td class="col-name">
+        <input 
+          type="text" 
+          class="form-control member-input member-name" 
+          placeholder="" 
+          required
+          autocomplete="off"
+        >
+      </td>
+      <td class="col-action"></td>
+    `;
+    tableBody.appendChild(newRow);
+    updateMemberRows();
+
+    // Focus newly added registration input
+    const newReg = newRow.querySelector(".member-reg");
+    if (newReg) newReg.focus();
+  });
+
+  // Real-time styling reset on input
+  tableBody.addEventListener("input", (e) => {
+    if (e.target.classList.contains("member-input")) {
+      if (e.target.value.trim().length > 0) {
+        e.target.style.borderColor = "rgba(0, 255, 135, 0.4)";
+      } else {
+        e.target.style.borderColor = "";
+      }
+    }
+  });
+
+  updateMemberRows();
+}
+
+/**
+ * Validates and compiles team member rows into one single multi-line string.
+ * Each line contains only one member detail, up to 6 lines total.
+ */
+function getGroupMembersData() {
+  const tableBody = document.getElementById("members-table-body");
+  if (!tableBody) return { valid: false, message: "Member table not found", compiled: "" };
+
+  const rows = tableBody.querySelectorAll(".member-row");
+  const lines = [];
+
+  if (rows.length < MIN_GROUP_MEMBERS) {
+    return { valid: false, message: "Group submission requires at least 2 team members.", compiled: "" };
+  }
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const memberNum = i + 1;
+    const regInput = row.querySelector(".member-reg");
+    const nameInput = row.querySelector(".member-name");
+    const reg = regInput ? regInput.value.trim() : "";
+    const name = nameInput ? nameInput.value.trim() : "";
+
+    if (!reg) {
+      if (regInput) {
+        regInput.style.borderColor = "#f43f5e";
+        regInput.focus();
+      }
+      return {
+        valid: false,
+        message: `Please enter the Registration Number for Member ${memberNum}.`,
+        compiled: ""
+      };
+    }
+
+    if (!name) {
+      if (nameInput) {
+        nameInput.style.borderColor = "#f43f5e";
+        nameInput.focus();
+      }
+      return {
+        valid: false,
+        message: `Please enter the Full Name for Member ${memberNum}.`,
+        compiled: ""
+      };
+    }
+
+    // Format one line per member
+    const leadTag = memberNum === 1 ? " (Team Lead)" : "";
+    lines.push(`${memberNum}. ${reg} - ${name}${leadTag}`);
+  }
+
+  const leadName = rows[0].querySelector(".member-name").value.trim();
+  const compiled = lines.join("\n");
+
+  const hiddenField = document.getElementById("groupMembers");
+  if (hiddenField) hiddenField.value = compiled;
+
+  return {
+    valid: true,
+    compiled,
+    leadName,
+    count: rows.length
+  };
+}
+
+function resetGroupMembersTable() {
+  const tableBody = document.getElementById("members-table-body");
+  if (!tableBody) return;
+  const rows = tableBody.querySelectorAll(".member-row");
+  for (let i = rows.length - 1; i >= 2; i--) {
+    rows[i].remove();
+  }
+  const inputs = tableBody.querySelectorAll(".member-input");
+  inputs.forEach(inp => {
+    inp.value = "";
+    inp.style.borderColor = "";
+  });
+  const addBtn = document.getElementById("add-member-btn");
+  const countEl = document.getElementById("members-count");
+  const maxAlert = document.getElementById("max-members-alert");
+  if (countEl) countEl.textContent = "2";
+  if (addBtn) addBtn.style.display = "inline-flex";
+  if (maxAlert) maxAlert.style.display = "none";
+}
+
+/* ==========================================================================
+   4. INTERACTIVE BATCH PILLS SELECTOR
    ========================================================================== */
 function initBatchPills() {
   const pills = document.querySelectorAll(".batch-pill");
@@ -150,7 +551,7 @@ function initBatchPills() {
 }
 
 /* ==========================================================================
-   3. FORM INTERACTIONS & SUBMISSION LOGIC
+   4. FORM INTERACTIONS & SUBMISSION LOGIC
    ========================================================================== */
 function initFormInteractions() {
   const heroBtn = document.getElementById("hero-submit-btn");
@@ -159,6 +560,9 @@ function initFormInteractions() {
   const regNoInput = document.getElementById("regNo");
   const descTextarea = document.getElementById("description");
   const charCounter = document.getElementById("char-counter");
+  const groupDescTextarea = document.getElementById("groupDescription");
+  const groupCharCounter = document.getElementById("group-char-counter");
+  const searchBtn = document.getElementById("search-trigger-btn");
 
   // Hero Button Click: Smooth Scroll + Focus
   if (heroBtn && formSection) {
@@ -178,7 +582,15 @@ function initFormInteractions() {
     });
   }
 
-  // Live Character & Word Counter
+  // Quick Search Trigger Button -> smooth scrolls to pillars
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      const pillars = document.getElementById("highlights-section");
+      if (pillars) pillars.scrollIntoView({ behavior: "smooth" });
+    });
+  }
+
+  // Live Character Counter
   if (descTextarea && charCounter) {
     descTextarea.addEventListener("input", () => {
       const len = descTextarea.value.length;
@@ -186,8 +598,21 @@ function initFormInteractions() {
     });
   }
 
+  // Pre-fill track if passed via query parameter (e.g. submit.html?track=Automotive)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackParam = urlParams.get("track");
+    const topicField = document.getElementById("topic");
+    if (trackParam && topicField && !topicField.value.trim()) {
+      topicField.value = `[${trackParam}] `;
+    }
+  } catch (err) {
+    console.warn("Could not read URL query params:", err);
+  }
+
   // Real-time Field Validation feedback
-  const fields = ["regNo", "fullName", "topic"];
+  const fields = ["regNo", "fullName", "topic", "description", "email", "phone"];
+
   fields.forEach(fieldId => {
     const input = document.getElementById(fieldId);
     const group = document.getElementById(`group-${fieldId}`);
@@ -215,8 +640,88 @@ function initFormInteractions() {
   }
 }
 
+/* Helper Email Validator */
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
+/* ==========================================================================
+   INTERACTIVE DOCK & BULB HANDLERS
+   ========================================================================== */
+function initDockInteractions() {
+  const dockItems = document.querySelectorAll(".dock-item");
+  const topicInput = document.getElementById("topic");
+  const formSection = document.getElementById("submit-section");
+  const form = document.getElementById("idea-form");
+
+  dockItems.forEach(item => {
+    item.addEventListener("click", (e) => {
+      const label = item.querySelector(".dock-label");
+      const trackName = label ? label.textContent.trim() : "";
+
+      if (formSection) {
+        e.preventDefault();
+        formSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (form) {
+          form.classList.add("form-active-glow");
+          setTimeout(() => form.classList.remove("form-active-glow"), 2200);
+        }
+
+        if (topicInput && trackName) {
+          setTimeout(() => {
+            if (!topicInput.value.trim()) {
+              topicInput.value = `[${trackName}] `;
+            }
+            topicInput.focus();
+          }, 600);
+        }
+      } else {
+        // On homepage: navigate to dedicated submit page with track parameter
+        e.preventDefault();
+        window.location.href = `submit.html?track=${encodeURIComponent(trackName)}`;
+      }
+    });
+  });
+}
+
+function initBulbInteractions() {
+  const bulb = document.getElementById("idea-bulb-trigger");
+  const formSection = document.getElementById("submit-section");
+  const form = document.getElementById("idea-form");
+  const regNoInput = document.getElementById("regNo");
+
+  if (bulb) {
+    bulb.addEventListener("click", () => {
+      // Subtle energy pulse
+      bulb.style.filter = "brightness(1.15) drop-shadow(0 0 20px #00FF87)";
+      setTimeout(() => {
+        bulb.style.filter = "";
+      }, 500);
+
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (form) {
+          form.classList.add("form-active-glow");
+          setTimeout(() => form.classList.remove("form-active-glow"), 2200);
+        }
+        setTimeout(() => {
+          if (regNoInput) regNoInput.focus();
+        }, 600);
+      } else {
+        // On homepage: navigate to dedicated submit page
+        window.location.href = "submit.html";
+      }
+    });
+  }
+}
+
 async function handleFormSubmit(e) {
   e.preventDefault();
+
+  if (!isSubmissionsOpen()) {
+    showAlert("Submissions are currently closed. New ideas cannot be submitted at this time.", "error");
+    return;
+  }
 
   const form = document.getElementById("idea-form");
   const submitBtn = document.getElementById("submit-btn");
@@ -224,30 +729,88 @@ async function handleFormSubmit(e) {
   const btnLabel = document.getElementById("btn-label");
   const alertBox = document.getElementById("form-alert");
 
-  // Validate Required Fields
-  const regNo = document.getElementById("regNo").value.trim();
-  const fullName = document.getElementById("fullName").value.trim();
-  const batch = selectedBatch || document.getElementById("batch").value;
-  const topic = document.getElementById("topic").value.trim();
-  const description = document.getElementById("description").value.trim();
-
+  const batch = selectedBatch || (document.getElementById("batch") ? document.getElementById("batch").value : "");
   let hasError = false;
 
-  function markError(id, msg) {
+  function markError(id) {
     const group = document.getElementById(id);
     if (group) group.classList.add("has-error");
     hasError = true;
   }
 
-  if (!regNo) markError("group-regNo");
-  if (!fullName) markError("group-fullName");
+  // 1. Common Batch Validation
   if (!batch) markError("group-batch");
-  if (!topic) markError("group-topic");
 
-  if (hasError) {
-    showAlert("Please fill in all required fields marked with an asterisk (*).", "error");
+  // 2. Proposal Details Validation (Unified)
+  const topic = document.getElementById("topic").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if (!topic) markError("group-topic");
+  if (!description) markError("group-description");
+  if (!email) {
+    markError("group-email");
+  } else if (!isValidEmail(email)) {
+    markError("group-email");
+    showAlert("Please enter a valid email address.", "error");
     return;
   }
+
+  // 3. Participant Details Validation
+  let regAndNames = "";
+  let participantSummary = "";
+  let submissionTypeTitle = "";
+
+  if (selectedSubmissionType === "individual") {
+    submissionTypeTitle = "Individual Submission";
+    const regNo = document.getElementById("regNo").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+
+    if (!regNo) markError("group-regNo");
+    if (!fullName) markError("group-fullName");
+
+    if (hasError) {
+      showAlert("Please fill in all required fields marked with an asterisk (*).", "error");
+      return;
+    }
+
+    regAndNames = `1. ${regNo} - ${fullName}`;
+    participantSummary = fullName;
+
+  } else {
+    // Group Submission Branch - Dynamic Table Validation (Min 2, Max 6)
+    submissionTypeTitle = "Group Submission";
+    const membersData = getGroupMembersData();
+    if (!membersData.valid) {
+      showAlert(membersData.message, "error");
+      const groupContainer = document.getElementById("group-groupMembers");
+      if (groupContainer) groupContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (hasError) {
+      showAlert("Please fill in all required fields marked with an asterisk (*).", "error");
+      return;
+    }
+
+    regAndNames = membersData.compiled;
+    participantSummary = `${membersData.leadName} & Team (${membersData.count} Members)`;
+  }
+
+  const submissionPayload = {
+    id: "SYNTHEX-" + Date.now().toString(36).toUpperCase(),
+    timestamp: new Date().toISOString(),
+    submissionType: selectedSubmissionType,
+    submissionTypeTitle,
+    batch,
+    regAndNames,
+    participantSummary,
+    topic,
+    description,
+    email,
+    phone
+  };
 
   // Clear Alert
   showAlert("", "");
@@ -256,16 +819,6 @@ async function handleFormSubmit(e) {
   submitBtn.disabled = true;
   btnSpinner.style.display = "inline-block";
   btnLabel.textContent = "Synchronizing with Spreadsheet...";
-
-  const submissionPayload = {
-    id: "SYNTHEX-" + Date.now().toString(36).toUpperCase(),
-    timestamp: new Date().toISOString(),
-    regNo,
-    fullName,
-    batch,
-    topic,
-    description
-  };
 
   try {
     // 1. Submit to Google Sheets (Direct Form endpoint or Apps Script Webhook)
@@ -277,20 +830,22 @@ async function handleFormSubmit(e) {
     // 3. Trigger Celebration Modal & Confetti
     showSuccessModal(submissionPayload);
 
-    // 4. Reset Form
+    // 4. Reset Form & Dynamic Member Table
     form.reset();
+    resetGroupMembersTable();
     document.querySelectorAll(".batch-pill").forEach(p => p.classList.remove("active"));
     selectedBatch = "";
     document.querySelectorAll(".form-group").forEach(g => {
       g.classList.remove("has-success", "has-error");
     });
-    document.getElementById("char-counter").textContent = "0 characters";
+    const c1 = document.getElementById("char-counter");
+    if (c1) c1.textContent = "0 characters";
 
   } catch (error) {
     console.error("Submission error:", error);
     // Still save locally so no work is lost
     saveSubmissionLocally(submissionPayload);
-    showSuccessModal(submissionPayload); // Google Forms returns opaque response with no-cors, which is expected and successful!
+    showSuccessModal(submissionPayload);
   } finally {
     submitBtn.disabled = false;
     btnSpinner.style.display = "none";
@@ -300,13 +855,12 @@ async function handleFormSubmit(e) {
 
 /**
  * Transmits the research idea to Google Sheets
- * Uses direct Google Form submission endpoint (or custom Apps Script webhook if configured)
+ * Uses direct Google Form unified endpoint (or custom Apps Script webhook if configured)
  */
 async function transmitToGoogleSheets(data) {
   const customUrl = localStorage.getItem(CONFIG.customScriptUrlKey);
 
   if (customUrl && customUrl.trim().startsWith("http")) {
-    // Option A: Custom Google Apps Script Web App
     const response = await fetch(customUrl.trim(), {
       method: "POST",
       mode: "no-cors",
@@ -315,21 +869,21 @@ async function transmitToGoogleSheets(data) {
     });
     return response;
   } else {
-    // Option B: Official Google Form submission endpoint
-    // Pre-mapped to:
-    // entry.1209126931 -> Registration No
-    // entry.618052818 -> Name
-    // entry.2122323594 -> Batch
-    // entry.2052985421 -> Topic
-    // entry.567243227 -> Describe Your Idea
     const formUrl = CONFIG.googleForm.endpoint;
     const formData = new URLSearchParams();
     
-    formData.append(CONFIG.googleForm.entries.regNo, data.regNo);
-    formData.append(CONFIG.googleForm.entries.fullName, data.fullName);
+    // Core parameters for Google Form submission
+    formData.append("fvv", "1");
+    formData.append("pageHistory", CONFIG.googleForm.pageHistory);
+    formData.append(CONFIG.googleForm.entries.submissionType, data.submissionTypeTitle);
     formData.append(CONFIG.googleForm.entries.batch, data.batch);
+    formData.append(CONFIG.googleForm.entries.regAndNames, data.regAndNames);
     formData.append(CONFIG.googleForm.entries.topic, data.topic);
     formData.append(CONFIG.googleForm.entries.description, data.description);
+    formData.append(CONFIG.googleForm.entries.email, data.email);
+    if (data.phone) {
+      formData.append(CONFIG.googleForm.entries.phone, data.phone);
+    }
 
     await fetch(formUrl, {
       method: "POST",
@@ -390,10 +944,19 @@ function showSuccessModal(data) {
   const modal = document.getElementById("success-modal");
   if (!modal) return;
 
-  document.getElementById("receipt-topic").textContent = data.topic;
-  document.getElementById("receipt-name").textContent = data.fullName;
-  document.getElementById("receipt-batch").textContent = data.batch;
-  document.getElementById("receipt-id").textContent = data.id;
+  const typeEl = document.getElementById("receipt-type");
+  const topicEl = document.getElementById("receipt-topic");
+  const nameEl = document.getElementById("receipt-name");
+  const batchEl = document.getElementById("receipt-batch");
+  const emailEl = document.getElementById("receipt-email");
+  const idEl = document.getElementById("receipt-id");
+
+  if (typeEl) typeEl.textContent = data.submissionTypeTitle || (data.submissionType === "group" ? "Group Submission" : "Individual Submission");
+  if (topicEl) topicEl.textContent = data.topic || "-";
+  if (nameEl) nameEl.textContent = data.participantSummary || "-";
+  if (batchEl) batchEl.textContent = data.batch || "-";
+  if (emailEl) emailEl.textContent = data.email || "-";
+  if (idEl) idEl.textContent = data.id || "-";
 
   modal.style.display = "flex";
   triggerConfetti();
@@ -409,13 +972,11 @@ function initModals() {
   }
 
   // Close modal when clicking backdrop
-  [successModal].forEach(m => {
-    if (m) {
-      m.addEventListener("click", (e) => {
-        if (e.target === m) m.style.display = "none";
-      });
-    }
-  });
+  if (successModal) {
+    successModal.addEventListener("click", (e) => {
+      if (e.target === successModal) successModal.style.display = "none";
+    });
+  }
 }
 
 // Lightweight Confetti Particle Generator
@@ -427,8 +988,9 @@ function triggerConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
+  const count = 120;
   const pieces = [];
-  const colors = ["#00FF87", "#10F996", "#05DF72", "#00F5D4", "#34D399", "#6EE7B7", "#1E3A8A", "#22C55E"];
+  const colors = ["#00FF87", "#10F996", "#05DF72", "#00F5D4", "#34D399", "#6EE7B7", "#051428", "#1E3A8A"];
 
   for (let i = 0; i < count; i++) {
     pieces.push({
@@ -492,7 +1054,7 @@ function initSettings() {
 
   if (openBtn && modal) {
     openBtn.addEventListener("click", () => {
-      input.value = localStorage.getItem(CONFIG.customScriptUrlKey) || "";
+      if (input) input.value = localStorage.getItem(CONFIG.customScriptUrlKey) || "";
       updateBackupCounter();
       modal.style.display = "flex";
     });
@@ -512,11 +1074,13 @@ function initSettings() {
 
   if (saveBtn) {
     saveBtn.addEventListener("click", () => {
-      const val = input.value.trim();
-      if (val) {
-        localStorage.setItem(CONFIG.customScriptUrlKey, val);
-      } else {
-        localStorage.removeItem(CONFIG.customScriptUrlKey);
+      if (input) {
+        const val = input.value.trim();
+        if (val) {
+          localStorage.setItem(CONFIG.customScriptUrlKey, val);
+        } else {
+          localStorage.removeItem(CONFIG.customScriptUrlKey);
+        }
       }
       modal.style.display = "none";
     });

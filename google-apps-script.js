@@ -28,18 +28,21 @@ function doPost(e) {
       sheet.appendRow([
         "Timestamp",
         "Reference ID",
-        "Registration No",
-        "Full Name",
+        "Submission Type",
         "Batch",
+        "Registration / Member Details",
+        "Presenter / Lead Name",
         "Topic of Your Idea",
-        "Describe Your Idea"
+        "Describe Your Idea",
+        "Email",
+        "Contact Number"
       ]);
       
       // Style header row
-      var headerRange = sheet.getRange(1, 1, 1, 7);
+      var headerRange = sheet.getRange(1, 1, 1, 10);
       headerRange.setFontWeight("bold");
-      headerRange.setBackground("#0d1b3e");
-      headerRange.setFontColor("#ffffff");
+      headerRange.setBackground("#020712");
+      headerRange.setFontColor("#00FF87");
     }
 
     var data;
@@ -55,26 +58,32 @@ function doPost(e) {
 
     var timestamp = data.timestamp || new Date().toLocaleString();
     var id = data.id || "SYNTHEX-" + Utilities.getUuid().slice(0, 8).toUpperCase();
-    var regNo = data.regNo || "";
-    var fullName = data.fullName || "";
+    var subType = data.submissionType === "group" ? "Group Submission" : "Individual Submission";
     var batch = data.batch || "";
-    var topic = data.topic || "";
-    var description = data.description || "";
+    var regDetails = data.submissionType === "group" ? (data.groupMembers || "") : (data.regNo || "");
+    var presenterName = data.submissionType === "group" ? "Team Entry" : (data.fullName || "");
+    var topic = data.topic || data.groupTopic || "";
+    var description = data.description || data.groupDescription || "";
+    var email = data.email || data.groupEmail || "";
+    var phone = data.phone || data.groupPhone || "";
 
     // Append submission row
     sheet.appendRow([
       timestamp,
       id,
-      regNo,
-      fullName,
+      subType,
       batch,
+      regDetails,
+      presenterName,
       topic,
-      description
+      description,
+      email,
+      phone
     ]);
 
     // Format new row
     var lastRow = sheet.getLastRow();
-    sheet.getRange(lastRow, 1, 1, 7).setVerticalAlignment("middle");
+    sheet.getRange(lastRow, 1, 1, 10).setVerticalAlignment("middle");
 
     return ContentService
       .createTextOutput(JSON.stringify({ status: "success", id: id }))
