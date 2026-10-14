@@ -66,6 +66,9 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   background-color: var(--bg-deep);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 body {
@@ -74,6 +77,8 @@ body {
   background: radial-gradient(circle at 65% -5%, #071f3a 0%, var(--bg-main) 40%, var(--bg-deep) 100%);
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
   line-height: 1.6;
   position: relative;
   -webkit-font-smoothing: antialiased;
@@ -503,12 +508,16 @@ body {
   justify-content: center;
   padding: 3.5rem 1.5rem 2.5rem;
   z-index: 10;
+  overflow-x: clip;
+  width: 100%;
+  max-width: 100%;
 }
 
 .hero-wrapper {
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .hero-grid {
@@ -516,11 +525,14 @@ body {
   grid-template-columns: 1.08fr 0.92fr;
   gap: 3.5rem;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Left Column Typography */
 .hero-left {
   text-align: left;
+  max-width: 100%;
 }
 
 .hero-badge {
@@ -539,22 +551,28 @@ body {
   margin-bottom: 1.8rem;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .sparkle {
   color: var(--accent-green);
   font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 /* SYNTHEX: Large Capital Title with Electric Green Gradient (Strictly Zero White) */
 .hero-title {
   font-family: var(--font-heading-display);
-  font-size: clamp(3.4rem, 7.5vw, 5.8rem);
+  font-size: clamp(2.4rem, 6.2vw, 5.5rem);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 0.95;
+  letter-spacing: 0.04em;
+  line-height: 0.98;
   margin-bottom: 0.5rem;
   position: relative;
+  max-width: 100%;
+  word-break: normal;
+  overflow-wrap: break-word;
   
   /* Luminous Electric Green Gradient - No White */
   background: linear-gradient(
@@ -575,17 +593,19 @@ body {
 /* Pitch Competition Subtitle (Directly Below SYNTHEX) */
 .hero-subtitle-container {
   margin-bottom: 1.6rem;
+  max-width: 100%;
 }
 
 .hero-subtitle {
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 2.4vw, 1.85rem);
+  font-size: clamp(1rem, 2.2vw, 1.85rem);
   font-weight: 600;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #a7f3d0;
   position: relative;
   display: inline-block;
+  max-width: 100%;
 }
 
 .hero-subtitle::after {
@@ -598,7 +618,7 @@ body {
 }
 
 .hero-description {
-  font-size: clamp(1.05rem, 1.8vw, 1.2rem);
+  font-size: clamp(1rem, 1.8vw, 1.18rem);
   color: var(--text-muted);
   max-width: 540px;
   margin-bottom: 2.5rem;
@@ -612,6 +632,7 @@ body {
   flex-wrap: wrap;
   gap: 1.15rem;
   margin-bottom: 1rem;
+  max-width: 100%;
 }
 
 /* "Submit Your Idea" Hero Button (Solid Electric Green Pill) */
@@ -723,8 +744,8 @@ body {
   top: 42%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 380px;
-  height: 380px;
+  width: min(380px, 85vw);
+  height: min(380px, 85vw);
   background: radial-gradient(circle, rgba(0, 255, 135, 0.45) 0%, rgba(0, 245, 212, 0.22) 40%, rgba(3, 14, 28, 0.05) 65%, transparent 75%);
   filter: blur(55px);
   border-radius: 50%;
@@ -751,11 +772,12 @@ body {
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 440px;
-  height: 440px;
+  width: min(420px, 90vw);
+  height: min(420px, 90vw);
   pointer-events: none;
   z-index: 0;
   opacity: 0.45;
+  overflow: hidden;
 }
 
 .bulb-ray {
@@ -906,7 +928,7 @@ body {
 /* Chip 3: Bottom Right */
 .chip-bottom-right {
   bottom: 16%;
-  right: -2%;
+  right: 1%;
   animation: floatChip3 5.5s ease-in-out infinite 1.5s;
 }
 
@@ -962,8 +984,9 @@ body {
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.85rem;
+  max-width: 100%;
 }
 
 .feature-card {
@@ -2221,9 +2244,11 @@ body {
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN (Tablets & Mobile Phones)
+   RESPONSIVE DESIGN SYSTEM (Desktop, Tablet, Mobile)
+   Airtight responsive styles to guarantee zero horizontal overflow on any device
    ========================================================================== */
 
+/* 1. TABLET & SMALL LAPTOPS (<= 1024px) */
 @media (max-width: 1024px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -2237,6 +2262,10 @@ body {
     align-items: center;
   }
 
+  .hero-title {
+    font-size: clamp(2.6rem, 6.5vw, 4.2rem);
+  }
+
   .hero-subtitle::after {
     margin: 0.4rem auto 0;
   }
@@ -2245,12 +2274,20 @@ body {
     justify-content: center;
   }
 
-  .hero-dock-bar {
-    grid-template-columns: repeat(3, 1fr);
+  .hero-right {
+    max-width: 380px;
+    margin: 0 auto;
   }
 }
 
+/* 2. TABLET PORTRAIT & LARGE MOBILE (<= 768px) */
 @media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+
   .nav-menu {
     display: none;
   }
@@ -2260,29 +2297,104 @@ body {
   }
 
   .nav-container {
-    padding: 1rem 1.25rem;
+    padding: 0.9rem 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .brand-logo {
+    font-size: 1.2rem;
+  }
+
+  .nav-cta-btn {
+    padding: 0.45rem 1.1rem;
+    font-size: 0.82rem;
   }
 
   .hero-section {
-    padding: 3rem 1.25rem 2rem;
+    padding: 2.8rem 1.25rem 2rem;
+    overflow-x: clip;
   }
 
-  .hero-dock-bar {
-    grid-template-columns: repeat(3, 1fr);
-    padding: 0.85rem;
-    gap: 0.5rem;
+  .hero-title {
+    font-size: clamp(2.1rem, 7.5vw, 3.2rem);
+    letter-spacing: 0.03em;
+  }
+
+  .hero-subtitle {
+    font-size: 1.05rem;
+    letter-spacing: 0.16em;
+  }
+
+  .hero-badge {
+    font-size: 0.76rem;
+    padding: 0.38rem 0.95rem;
+    letter-spacing: 0.04em;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .hero-description {
+    font-size: 1.02rem;
+    max-width: 500px;
+    margin-bottom: 2rem;
+  }
+
+  /* Bulb scaling for tablets */
+  .hero-right {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+
+  .idea-bulb-wrapper {
+    max-width: 320px;
+  }
+
+  .bulb-glow-aura {
+    width: 260px;
+    height: 260px;
+  }
+
+  .bulb-rays-container {
+    width: 280px;
+    height: 280px;
+  }
+
+  .bulb-ray {
+    width: 90px;
+  }
+
+  /* Cards grid */
+  .highlights-section {
+    padding: 3.5rem 1.25rem 2.5rem;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1.35rem;
+  }
+
+  /* Submit Form */
+  .form-section,
+  .form-standalone-section {
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+
+  .form-main-title {
+    font-size: 2.1rem;
   }
 
   .modern-form {
-    padding: 2.2rem 1.5rem;
-  }
-
-  .batch-pills-container {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 2.2rem 1.4rem;
+    border-radius: 20px;
+    gap: 1.5rem;
   }
 
   .type-toggle-container {
     grid-template-columns: 1fr;
+  }
+
+  .batch-pills-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .members-table th,
@@ -2315,34 +2427,404 @@ body {
     flex-direction: column;
     text-align: center;
     align-items: center;
+    gap: 1.25rem;
   }
 }
 
+/* 3. MOBILE PHONES (<= 480px) - e.g. Huawei Nova Y61 (360px), iPhone (390px), Galaxy (360-412px) */
 @media (max-width: 480px) {
+  .nav-container {
+    padding: 0.75rem 0.9rem;
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    font-size: 1.12rem;
+    gap: 0.45rem;
+  }
+
+  .nav-cta-btn {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .nav-back-btn {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.78rem;
+  }
+
+  .hero-section {
+    padding: 1.8rem 0.85rem 1.5rem;
+    overflow-x: clip;
+  }
+
+  .hero-badge {
+    font-size: 0.68rem;
+    padding: 0.35rem 0.75rem;
+    gap: 0.35rem;
+    letter-spacing: 0.03em;
+    margin-bottom: 1.15rem;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.35;
+    max-width: 100%;
+  }
+
+  /* SYNTHEX Title: Proportional scaling so it NEVER overflows horizontally on 360px screens */
   .hero-title {
-    font-size: 3.2rem;
+    font-size: clamp(1.85rem, 8.8vw, 2.35rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    margin-bottom: 0.35rem;
+    word-break: normal;
   }
 
   .hero-subtitle {
-    font-size: 1.15rem;
-    letter-spacing: 0.18em;
+    font-size: 0.92rem;
+    letter-spacing: 0.12em;
   }
 
-  .hero-dock-bar {
-    grid-template-columns: repeat(2, 1fr);
+  .hero-subtitle-container {
+    margin-bottom: 1.15rem;
+  }
+
+  .hero-description {
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin-bottom: 1.6rem;
+    padding: 0 0.2rem;
+  }
+
+  /* Buttons: Full-width stacked with comfortable touch targets that fit 100% of screen */
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+    align-items: stretch;
   }
 
   .cta-primary-btn {
     width: 100%;
     justify-content: center;
+    padding: 0.82rem 1.25rem;
+    font-size: 0.96rem;
+    box-sizing: border-box;
+    text-align: center;
   }
 
   .cta-secondary-btn {
     width: 100%;
     justify-content: center;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.92rem;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* Idea Bulb: Scaled to fit comfortably on 360px viewports without radiating outside screen */
+  .hero-right {
+    max-width: 280px;
+    margin: 0 auto;
+    overflow: visible;
+  }
+
+  .idea-bulb-wrapper {
+    max-width: 250px;
+  }
+
+  .bulb-glow-aura {
+    width: 200px;
+    height: 200px;
+  }
+
+  .bulb-rays-container {
+    width: 210px;
+    height: 210px;
+  }
+
+  .bulb-ray {
+    width: 65px;
+  }
+
+  .bulb-chip {
+    padding: 0.28rem 0.6rem;
+    gap: 0.3rem;
+  }
+
+  .chip-text {
+    font-size: 0.66rem;
+  }
+
+  .chip-sparkle {
+    font-size: 0.7rem;
+  }
+
+  .chip-top-left {
+    left: 0;
+    top: 4%;
+  }
+
+  .chip-top-right {
+    right: 0;
+    top: 4%;
+  }
+
+  .chip-bottom-right {
+    right: 0;
+    bottom: 8%;
+  }
+
+  /* Highlights Section */
+  .highlights-section {
+    padding: 2.5rem 0.85rem 1.8rem;
+  }
+
+  .section-tag {
+    font-size: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .section-desc {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .feature-card {
+    padding: 1.4rem 1.1rem;
+    border-radius: 16px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.15rem;
+  }
+
+  .feature-card p {
+    font-size: 0.88rem;
+  }
+
+  /* Submit Form Section */
+  .form-section,
+  .form-standalone-section {
+    padding: 1.5rem 0.75rem 2.8rem;
+  }
+
+  .form-pill {
+    font-size: 0.72rem;
+    padding: 0.32rem 0.8rem;
+  }
+
+  .form-main-title {
+    font-size: 1.6rem;
+  }
+
+  .form-sub-desc {
+    font-size: 0.88rem;
+    padding: 0 0.4rem;
+  }
+
+  .form-card-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .modern-form {
+    padding: 1.5rem 0.95rem;
+    border-radius: 18px;
+    gap: 1.35rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    padding: 0.78rem 0.9rem 0.78rem 2.5rem;
+    font-size: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .input-icon {
+    left: 0.8rem;
+  }
+
+  .form-textarea {
+    padding: 0.85rem;
+    min-height: 110px;
+    font-size: 0.9rem;
+  }
+
+  .type-toggle-btn {
+    padding: 0.9rem 0.95rem;
+    border-radius: 14px;
+  }
+
+  .type-title {
+    font-size: 0.95rem;
+  }
+
+  .batch-pill {
+    padding: 0.72rem 0.3rem;
+    font-size: 0.9rem;
+    gap: 0.4rem;
+  }
+
+  .batch-radio {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* Dynamic Members Table Mobile */
+  .members-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .members-count-pill {
+    font-size: 0.76rem;
+    padding: 0.25rem 0.65rem;
+  }
+
+  .members-table-container {
+    border-radius: 12px;
+  }
+
+  .members-footer-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .add-member-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .max-members-alert {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.78rem;
+    padding: 0.45rem 0.75rem;
+  }
+
+  .submit-action-btn {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.98rem;
+    border-radius: 999px;
+  }
+
+  /* Submissions Closed Card */
+  .submissions-closed-card {
+    padding: 2rem 0.8rem;
+  }
+
+  .closed-title {
+    font-size: 1.45rem;
+  }
+
+  .closed-description {
+    font-size: 0.88rem;
+    line-height: 1.55;
   }
 
   .closed-info-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .closed-info-item {
+    padding: 0.9rem 0.8rem;
+  }
+
+  .closed-home-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    padding: 0.75rem;
+  }
+
+  .modal-card {
+    padding: 1.75rem 1.1rem;
+    border-radius: 18px;
+  }
+
+  .modal-title {
+    font-size: 1.35rem;
+  }
+
+  .modal-desc {
+    font-size: 0.86rem;
+  }
+
+  .receipt-box {
+    padding: 0.85rem;
+  }
+
+  .receipt-row {
+    font-size: 0.8rem;
+  }
+
+  /* Footer */
+  .footer {
+    padding: 2.2rem 1rem;
+  }
+
+  .footer-tagline {
+    font-size: 0.82rem;
+  }
+
+  .footer-sts-logo {
+    width: 52px;
+  }
+}
+
+/* 4. COMPACT MOBILE SCREENS (<= 360px) - e.g. smaller screens, Galaxy Fold, tight viewports */
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 1.85rem;
+    letter-spacing: 0.01em;
+  }
+
+  .hero-subtitle {
+    font-size: 0.84rem;
+    letter-spacing: 0.08em;
+  }
+
+  .brand-logo {
+    font-size: 1.05rem;
+  }
+
+  .nav-cta-btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.75rem;
+  }
+
+  .hero-right {
+    max-width: 240px;
+  }
+
+  .idea-bulb-wrapper {
+    max-width: 220px;
+  }
+
+  .cta-primary-btn,
+  .cta-secondary-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .modern-form {
+    padding: 1.35rem 0.8rem;
   }
 }
