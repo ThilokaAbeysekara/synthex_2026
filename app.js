@@ -163,23 +163,26 @@ function initAmbientCanvas() {
   const ctx = canvas.getContext("2d");
   let width, height;
   let particles = [];
-  const particleCount = 45;
-  const maxDistance = 130;
+
+  const isMobile = window.innerWidth <= 768;
+  const particleCount = isMobile ? 16 : 42;
+  const maxDistance = isMobile ? 90 : 125;
+  const maxDistanceSq = maxDistance * maxDistance;
 
   function resize() {
     width = canvas.width = window.innerWidth;
     height = canvas.height = window.innerHeight;
   }
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", resize, { passive: true });
   resize();
 
   class Particle {
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.vx = (Math.random() - 0.5) * 0.35;
-      this.vy = (Math.random() - 0.5) * 0.35;
-      this.radius = Math.random() * 1.8 + 0.8;
+      this.vx = (Math.random() - 0.5) * (isMobile ? 0.25 : 0.35);
+      this.vy = (Math.random() - 0.5) * (isMobile ? 0.25 : 0.35);
+      this.radius = Math.random() * 1.6 + 0.8;
       this.alpha = Math.random() * 0.4 + 0.15;
     }
 
@@ -197,8 +200,10 @@ function initAmbientCanvas() {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(0, 255, 135, ${this.alpha})`;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = "#00FF87";
+      if (!isMobile) {
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = "#00FF87";
+      }
       ctx.fill();
     }
   }
@@ -207,18 +212,44 @@ function initAmbientCanvas() {
     particles.push(new Particle());
   }
 
+  // Touch scroll throttling on mobile:
+  // Pauses canvas redraw while user's finger is actively scrolling,
+  // providing 100% of GPU resources to ultra-smooth 60fps scrolling
+  let isScrolling = false;
+  let scrollTimer = null;
+  window.addEventListener("scroll", () => {
+    if (isMobile) {
+      isScrolling = true;
+      if (scrollTimer) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isScrolling = false;
+      }, 100);
+    }
+  }, { passive: true });
+
+  let isTabVisible = true;
+  document.addEventListener("visibilitychange", () => {
+    isTabVisible = !document.hidden;
+  });
+
   function animate() {
+    requestAnimationFrame(animate);
+
+    if (!isTabVisible) return;
+    if (isMobile && isScrolling) return;
+
     ctx.clearRect(0, 0, width, height);
 
-    // Draw connection lines
+    // Optimized connection lines: squared-distance check avoids expensive Math.sqrt for distant pairs
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distSq = dx * dx + dy * dy;
 
-        if (dist < maxDistance) {
-          const alpha = (1 - dist / maxDistance) * 0.14;
+        if (distSq < maxDistanceSq) {
+          const dist = Math.sqrt(distSq);
+          const alpha = (1 - dist / maxDistance) * (isMobile ? 0.11 : 0.14);
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
@@ -234,8 +265,6 @@ function initAmbientCanvas() {
       p.update();
       p.draw();
     });
-
-    requestAnimationFrame(animate);
   }
   animate();
 }
